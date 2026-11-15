@@ -159,6 +159,7 @@ El contrato REST se mantuvo intacto:
 | 7 | Pint + limpieza de tests de ejemplo | ✅ | `501a743` |
 | 8 | Documentación final (README + AGENT) | ✅ | `b9d6d08` + `d2cc251` |
 | 9 | Merge a `main`, tag y push | ✅ | `b8f3fcf` + tag `v2.0.0-laravel13` |
+| 10 | Revisión final: clon limpio, LF, smoke HTTP y tag final | ✅ | `8c0d975` + commit de cierre |
 
 > El tag `v1.0.0-php8.3` marca el intento anterior; no se reescribió la historia.
 
@@ -213,6 +214,37 @@ Comprobaciones manuales:
 - Distrito `150101`: 540 colegios únicos (paginación real contra MINEDU).
 - No existe `index.php` en la raíz; el entrypoint es `public/index.php`.
 
+### Revisión final desde clon limpio (2026-11-15)
+
+```text
+$ git clone https://github.com/Joshua-A-hub/escale-bridge-api.git
+$ composer install
+  Exit 0
+
+$ php artisan test
+  Tests: 16 passed (109 assertions)
+
+$ vendor/bin/pint --test
+  PASS (46 files)
+
+$ composer audit
+  No security vulnerability advisories found.
+```
+
+Smoke test con `php artisan serve`:
+
+| Ruta | Resultado |
+|---|---|
+| `/` | 200, JSON con `php` y `laravel` |
+| `/up` | 200 |
+| `/api/regiones` | 200, JSON |
+| `/api/user` | 404 |
+| `/.env` | 404 |
+| `/composer.json` | 404 |
+| `/vendor/autoload.php` | 404 |
+
+Además, `.gitattributes` fuerza `eol=lf` en PHP, Markdown, JSON, XML, YAML, `artisan`, `.htaccess` y `.env.example`, de modo que Pint pasa igual en Windows y en CI.
+
 ---
 
 ## 7. ⚠️ Limitaciones conocidas y siguientes pasos
@@ -229,4 +261,4 @@ Comprobaciones manuales:
 
 1. **Plan antes del agente:** `PLAN_MIGRACION.md` (`54fd2b3`) se escribió y commiteó antes de modificar el código.
 2. **Commits antes de inicializar:** el baseline `24261a4` ya estaba commiteado y pusheado; la rama nueva parte de ahí.
-3. **Push:** rama `feature/migracion-laravel13-php8.3`, merge a `main` y tag `v2.0.0-laravel13` publicados en `origin`.
+3. **Push:** rama `feature/migracion-laravel13-php8.3`, merge a `main` y tag `v2.0.0-laravel13` publicados en `origin`. El tag se re-apuntó al commit final de la revisión para que incluya el README/AGENT definitivos.

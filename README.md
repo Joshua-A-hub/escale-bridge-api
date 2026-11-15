@@ -6,6 +6,26 @@ Microservicio REST que sincroniza y sirve el catálogo oficial de **regiones, pr
 >
 > Este repositorio es un fork de [`hubelsolis/brigesnote`](https://github.com/hubelsolis/brigesnote). El repositorio propio es [`Joshua-A-hub/escale-bridge-api`](https://github.com/Joshua-A-hub/escale-bridge-api).
 
+### ✅ Verificación final (2026-11-15)
+
+Se repitió el flujo completo desde un **clon limpio de GitHub**, no solo desde la copia de trabajo:
+
+| Verificación | Resultado |
+|---|---|
+| `composer install` en clon limpio | Exit 0 |
+| `php artisan test` | **16 tests, 109 aserciones** |
+| `vendor/bin/pint --test` | **PASS (46 archivos, LF)** |
+| `composer audit` | **Sin vulnerabilidades** |
+| `GET /` | 200, JSON con versión de PHP/Laravel |
+| `GET /up` | 200 (health check) |
+| `GET /api/regiones` | 200, JSON |
+| `GET /api/user` | **404** (ruta eliminada) |
+| `GET /.env` | **404** (fuera del webroot) |
+| `GET /composer.json` | **404** |
+| `GET /vendor/autoload.php` | **404** |
+
+También se normalizaron los finales de línea con `.gitattributes` (`eol=lf`) para que Pint pase igual en Windows y en CI. El tag `v2.0.0-laravel13` apunta al commit final de esta revisión.
+
 ---
 
 ## 📋 Contenido
@@ -342,6 +362,24 @@ git log --oneline --decorate
 ```
 
 La estrategia cumple lo pedido por el profesor: **plan de trabajo antes de ejecutar el agente** (`PLAN_MIGRACION.md`), **baseline commiteado antes de inicializar** (`24261a4`) y **push** del resultado.
+
+---
+
+## ✅ Checklist de entrega
+
+- [x] Plan de trabajo commiteado antes de ejecutar el agente (`54fd2b3`).
+- [x] Baseline original commiteado y pusheado (`24261a4`).
+- [x] Migración a Laravel 13.42.0 / PHP 8.3.16.
+- [x] Esqueleto nuevo (`bootstrap/app.php`, `bootstrap/providers.php`).
+- [x] `.env` fuera del webroot; entrypoint único en `public/`.
+- [x] Rate limit de 60 req/min conservado y probado.
+- [x] Sync con paginación, deduplicación, reintentos y continuación.
+- [x] Migraciones anónimas.
+- [x] Frontend Laravel Mix eliminado.
+- [x] 16 tests / 109 aserciones.
+- [x] `composer audit` sin vulnerabilidades.
+- [x] `pint --test` y `composer validate` limpios.
+- [x] Rama, merge a `main`, tag `v2.0.0-laravel13` y push a `origin`.
 
 ---
 
