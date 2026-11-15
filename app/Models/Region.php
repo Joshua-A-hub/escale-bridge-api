@@ -12,8 +12,11 @@ class Region extends Model
     use HasFactory;
 
     protected $table = 'regions';
+
     protected $primaryKey = 'idRegion';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     /**
