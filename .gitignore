@@ -1,7 +1,7 @@
 # Composer & Dependencias PHP
 /vendor
 
-# Node & Dependencias Frontend
+# Node & Dependencias Frontend (el proyecto es API-only)
 /node_modules
 npm-debug.log*
 yarn-debug.log*
@@ -43,9 +43,11 @@ yarn-error.log*
 
 /public/storage
 /public/hot
+/public/build
 
 # Tests & Herramientas
 .phpunit.result.cache
+.phpunit.cache/
 Homestead.json
 Homestead.yaml
 

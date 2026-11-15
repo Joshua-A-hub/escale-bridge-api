@@ -12,8 +12,11 @@ class School extends Model
     use HasFactory;
 
     protected $table = 'schools';
+
     protected $primaryKey = 'codMod';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     /**

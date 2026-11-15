@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -7,12 +9,23 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| El servicio es API-only: no hay vistas ni frontend. La raíz devuelve
+| metadatos útiles para verificar el despliegue y descubrir los endpoints.
 |
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return response()->json([
+        'service' => 'ESCALE Bridge API',
+        'status' => 'ok',
+        'php' => PHP_VERSION,
+        'laravel' => app()->version(),
+        'endpoints' => [
+            'GET /api/regiones',
+            'GET /api/provincias/{idRegion}',
+            'GET /api/distritos/{idProvince}',
+            'GET /api/colegios/{ubigeo}',
+        ],
+        'health' => '/up',
+    ]);
+})->name('home');

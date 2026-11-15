@@ -12,8 +12,11 @@ class Province extends Model
     use HasFactory;
 
     protected $table = 'provinces';
+
     protected $primaryKey = 'idProvincia';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     /**
