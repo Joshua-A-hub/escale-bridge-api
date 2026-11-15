@@ -157,8 +157,8 @@ El contrato REST se mantuvo intacto:
 | 5 | Migraciones anónimas | ✅ | `bf9ae47` |
 | 6 | Eliminación del frontend Laravel Mix | ✅ | `f794067` |
 | 7 | Pint + limpieza de tests de ejemplo | ✅ | `501a743` |
-| 8 | Documentación final (README + AGENT) | ✅ | commit de docs |
-| 9 | Merge a `main`, tag y push | ⏳ | `merge: laravel 13 migration` + tag `v2.0.0-laravel13` |
+| 8 | Documentación final (README + AGENT) | ✅ | `b9d6d08` + `d2cc251` |
+| 9 | Merge a `main`, tag y push | ✅ | `b8f3fcf` + tag `v2.0.0-laravel13` |
 
 > El tag `v1.0.0-php8.3` marca el intento anterior; no se reescribió la historia.
 
