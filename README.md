@@ -1,6 +1,6 @@
-# 🏫 Bridges Note - MINEDU ESCALE Bridge API
+# 🏫 Bridges Note - MINEDU ESCALE Bridge API (PHP 8.3)
 
-Microservicio y API REST en **Laravel 7** diseñado para sincronizar, estructurar y servir el catálogo oficial de instituciones educativas (colegios) y la división política/geográfica (regiones, provincias y distritos) del Perú, consumiendo directamente la API pública oficial de **MINEDU / ESCALE** (*Estadística de la Calidad Educativa*).
+Microservicio y API REST modernizado y migrado a **PHP 8.3 / Laravel 10** diseñado para sincronizar, estructurar y servir el catálogo oficial de instituciones educativas (colegios) y la división política/geográfica (regiones, provincias y distritos) del Perú, consumiendo directamente la API pública oficial de **MINEDU / ESCALE** (*Estadística de la Calidad Educativa*).
 
 ---
 
@@ -8,13 +8,13 @@ Microservicio y API REST en **Laravel 7** diseñado para sincronizar, estructura
 
 1. [Propósito del Proyecto](#-propósito-del-proyecto)
 2. [Arquitectura y Flujo de Datos](#-arquitectura-y-flujo-de-datos)
-3. [Requisitos del Sistema](#-requisitos-del-sistema)
+3. [Requisitos del Sistema (Migrado a PHP 8.3)](#-requisitos-del-sistema-migrado-a-php-83)
 4. [Instalación y Puesta en Marcha](#-instalación-y-puesta-en-marcha)
 5. [Configuración de Entorno (.env)](#-configuración-de-entorno-env)
 6. [Sincronización de Datos (Consola Artisan)](#-sincronización-de-datos-consola-artisan)
 7. [Documentación de la API REST](#-documentación-de-la-api-rest)
-8. [Estructura del Proyecto](#-estructura-del-proyecto)
-9. [Solución de Problemas Frecuentes](#-solución-de-problemas-frecuentes)
+8. [Ejecución de Pruebas Automatizadas](#-ejecución-de-pruebas-automatizadas)
+9. [Estructura del Proyecto y Decisiones de Migración](#-estructura-del-proyecto-y-decisiones-de-migración)
 
 ---
 
@@ -31,13 +31,13 @@ Servir como un **puente de datos optimizado** para aplicaciones cliente (sistema
  (escale.minedu.gob.pe)
           │
           ▼  (Comando: php artisan sync:locations)
-[ Base de Datos Local MySQL (escalebridge) ]
+[ Base de Datos Local MySQL / MariaDB (escalebridge) ]
   ├── regions
   ├── provinces
   ├── districts
   └── schools (con ubigeo / idDistrito)
           │
-          ▼  (LocationController)
+          ▼  (LocationController con tipado estricto PHP 8.3)
 [ Endpoints API REST Local / Producción ]
   ├── GET /api/regiones
   ├── GET /api/provincias/{idRegion}
@@ -50,14 +50,15 @@ Servir como un **puente de datos optimizado** para aplicaciones cliente (sistema
 
 ---
 
-## 💻 Requisitos del Sistema
+## 💻 Requisitos del Sistema (Migrado a PHP 8.3)
 
-- **PHP:** `7.4.x` (Recomendado) o `8.0.x`.
-  > ⚠️ **Importante:** Laravel 7 no es compatible con PHP 8.1 o superior debido a cambios en la interfaz `ArrayAccess`.
-- **Laravel Framework:** `7.30.7`
+- **PHP:** `^8.3.x` (Totalmente compatible y optimizado para PHP 8.3).
+  > ✅ **Migración Completada:** Se superó la restricción de incompatibilidad de `ArrayAccess` de PHP 8.1+ al elevar las dependencias base a **Laravel 10**, implementando tipado estricto (`declare(strict_types=1);`), consultas SQL portables ANSI y manejo seguro de respuestas nulas.
+- **Laravel Framework:** `10.50.x`
 - **Gestor de Paquetes:** Composer 2.x
+- **Extensiones PHP requeridas:** `pdo`, `pdo_mysql`, `pdo_sqlite` (para tests), `curl`, `mbstring`, `zip`.
 - **Base de Datos:** MySQL 5.7+ / 8.0+ o MariaDB 10.3+
-- **Servidor Web Local:** Laragon (con PHP 7.4 Thread Safe - TS), XAMPP o `php artisan serve`.
+- **Servidor Web Local:** Laragon (con PHP 8.3 TS), Docker o `php artisan serve`.
 
 ---
 
@@ -65,17 +66,17 @@ Servir como un **puente de datos optimizado** para aplicaciones cliente (sistema
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/hubelsolis/brigesnote.git
-cd brigesnote
+git clone https://github.com/Joshua-A-hub/escale-bridge-api.git
+cd escale-bridge-api
 ```
 
-### 2. Instalar dependencias de Composer
+### 2. Instalar dependencias de Composer (bajo PHP 8.3)
 ```bash
 composer install
 ```
 
 ### 3. Configurar variables de entorno
-Copia el archivo de ejemplo y genera la clave de cifrado:
+Copia el archivo de ejemplo y genera la clave criptográfica:
 ```bash
 cp .env.example .env
 php artisan key:generate
@@ -106,48 +107,20 @@ La aplicación quedará disponible en `http://127.0.0.1:8000`.
 
 ---
 
-## ⚙️ Configuración de Entorno (.env)
+## 🧪 Ejecución de Pruebas Automatizadas
 
-Asegúrate de tener estos valores configurados en tu archivo `.env`:
-
-```env
-APP_NAME="Bridges Note"
-APP_ENV=local
-APP_KEY=base64:...
-APP_DEBUG=true
-APP_URL=http://127.0.0.1:8000
-
-# Conexión MySQL
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=escalebridge
-DB_USERNAME=root
-DB_PASSWORD=
-
-# Controlador de sesión en archivo (no requiere tabla 'sessions' en BD)
-SESSION_DRIVER=file
-CACHE_DRIVER=file
-QUEUE_CONNECTION=sync
-```
-
----
-
-## 📥 Sincronización de Datos (Consola Artisan)
-
-El comando central del sistema es:
+El proyecto incluye una suite completa de pruebas unitarias y de integración para validar los endpoints de la API bajo PHP 8.3 utilizando SQLite en memoria:
 
 ```bash
-php artisan sync:locations
+vendor/bin/phpunit
 ```
 
-### ¿Cómo opera la sincronización?
-1. **Regiones (`/padron/rest/regiones`):** Descarga los 25 departamentos del país con sus nombres, coordenadas (`pointX`, `pointY`) y nivel de `zoom`.
-2. **Provincias (`/padron/rest/provincias?idRegion={id}`):** Por cada región, descarga sus provincias.
-3. **Distritos (`/padron/rest/distritos?idProvincia={id}`):** Por cada provincia, descarga los distritos correspondientes.
-4. **Colegios (`/padron/rest/instituciones?estados=1&ubigeo={idDistrito}`):** Por cada distrito, descarga las instituciones educativas activas y las almacena en la tabla `schools` vinculando el código modular (`codMod`) como llave primaria y asociando el `idDistrito`.
-
-> ⏱️ **Nota:** La sincronización total recorre más de 1,800 distritos y 80,000 colegios, por lo que puede tomar varios minutos según la velocidad de conexión y respuesta del servidor del MINEDU.
+Resultado esperado:
+```text
+PHPUnit 10.5.67 by Sebastian Bergmann and contributors.
+Runtime: PHP 8.3.16
+OK (7 tests, 12 assertions)
+```
 
 ---
 
@@ -156,8 +129,6 @@ php artisan sync:locations
 Todos los endpoints retornan respuestas en formato JSON bajo el prefijo `/api/`.
 
 ### 1. Listar Regiones / Departamentos
-Obtiene todas las regiones del país.
-
 - **URL:** `/api/regiones`
 - **Método:** `GET`
 - **Respuesta Exitosa (200 OK):**
@@ -179,8 +150,6 @@ Obtiene todas las regiones del país.
 ---
 
 ### 2. Listar Provincias por Región
-Obtiene las provincias pertenecientes a una región (mediante los 2 primeros dígitos del código de departamento).
-
 - **URL:** `/api/provincias/{idRegion}`
 - **Método:** `GET`
 - **Ejemplo:** `/api/provincias/15` (Provincias de Lima)
@@ -202,8 +171,6 @@ Obtiene las provincias pertenecientes a una región (mediante los 2 primeros dí
 ---
 
 ### 3. Listar Distritos por Provincia
-Obtiene los distritos de una provincia (mediante los 4 dígitos de ubigeo provincial).
-
 - **URL:** `/api/distritos/{idProvince}`
 - **Método:** `GET`
 - **Ejemplo:** `/api/distritos/1501` (Distritos de la provincia de Lima)
@@ -215,10 +182,6 @@ Obtiene los distritos de una provincia (mediante los 4 dígitos de ubigeo provin
     {
       "idDistrito": "150101",
       "nombreDistrito": "LIMA"
-    },
-    {
-      "idDistrito": "150102",
-      "nombreDistrito": "ANCON"
     }
   ]
 }
@@ -227,8 +190,6 @@ Obtiene los distritos de una provincia (mediante los 4 dígitos de ubigeo provin
 ---
 
 ### 4. Listar Colegios por Distrito (Ubigeo)
-Obtiene todas las instituciones educativas registradas en un distrito según su ubigeo de 6 dígitos.
-
 - **URL:** `/api/colegios/{ubigeo}`
 - **Método:** `GET`
 - **Ejemplo:** `/api/colegios/150101`
@@ -243,9 +204,7 @@ Obtiene todas las instituciones educativas registradas en un distrito según su 
       "nombreCenEdu": "JUAN JIMENEZ PIMENTEL",
       "cenPob": "LIMA",
       "dirCen": "JR. LAMPA 240",
-      "director": "PEDRO PEREZ",
-      "dis_crecer": null,
-      "dis_juntos": null
+      "director": "PEDRO PEREZ"
     }
   ]
 }
@@ -253,46 +212,9 @@ Obtiene todas las instituciones educativas registradas en un distrito según su 
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📂 Estructura del Proyecto y Decisiones de Migración
 
-```
-brigesnote/
-├── app/
-│   ├── Console/Commands/
-│   │   └── SyncLocations.php       # Comando 'sync:locations' (consumo de API ESCALE)
-│   ├── Http/Controllers/
-│   │   └── LocationController.php  # Controlador de endpoints /api/
-│   └── Models/
-│       ├── District.php            # Modelo Distritos
-│       ├── Province.php            # Modelo Provincias
-│       ├── Region.php              # Modelo Regiones
-│       └── School.php              # Modelo Colegios / Escuelas
-├── database/migrations/
-│   ├── ..._create_regions_table.php
-│   ├── ..._create_provinces_table.php
-│   ├── ..._create_districts_table.php
-│   └── ..._create_schools_table.php
-├── routes/
-│   └── api.php                     # Definición de rutas REST
-├── .env.example                    # Plantilla de variables de entorno
-└── .gitignore                      # Reglas de exclusión para Git
-```
-
----
-
-## 🛠️ Solución de Problemas Frecuentes
-
-### 1. Error: `During inheritance of ArrayAccess: Return type of ... should either be compatible`
-- **Causa:** Estás ejecutando el proyecto con PHP 8.1, 8.2 o superior.
-- **Solución:** Cambia la versión de PHP en Laragon (o en tu servidor) a **PHP 7.4 (Thread Safe)** o **PHP 8.0**.
-
-### 2. Error: `Service Apache can not start ... fcgid.conf` en Laragon
-- **Causa:** Descargaste la versión `nts` (Non-Thread Safe) de PHP en Windows.
-- **Solución:** Descarga e instala en Laragon la versión **Thread Safe (TS)** desde [windows.php.net](https://windows.php.net/downloads/releases/archives/).
-
-### 3. Error: `Base table or view not found: 1146 Table '...sessions' doesn't exist`
-- **Causa:** En el archivo `.env` está configurado `SESSION_DRIVER=database` sin haber migrado la tabla de sesiones.
-- **Solución:** Cambia en `.env` a `SESSION_DRIVER=file`.
+Consulta el archivo [`AGENT.md`](./AGENT.md) para revisar los *Architectural Decision Records (ADRs)*, la bitácora de migración y la estrategia de versionamiento (`upstream` vs `origin`).
 
 ---
 
