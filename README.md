@@ -227,14 +227,16 @@ El comando recorre la cascada **región → provincia → distrito → colegios*
    - exit code `1` si hubo fallos, conservando lo ya sincronizado.
 5. **Resumen final.** Imprime cuántas regiones, provincias, distritos y colegios se procesaron.
 
-### Salida esperada
+### Ejemplo de salida
 
 ```text
 Iniciando sincronización de ubicaciones desde MINEDU/ESCALE...
 Sincronizando regiones...
 ...
-Sincronización finalizada: 25 regiones, 196 provincias, 1874 distritos y 104321 colegios.
+Sincronización finalizada: N regiones, N provincias, N distritos y N colegios.
 ```
+
+Los conteos dependen de la data que devuelva el MINEDU en ese momento.
 
 > El tiempo depende de la respuesta del MINEDU. Si el servicio estatal corta la conexión, el comando reintenta y continúa; no pierde lo ya grabado.
 
